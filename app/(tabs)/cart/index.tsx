@@ -3,7 +3,7 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation } from 'expo-router';
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // 목업 데이터 (10개)
@@ -34,6 +34,10 @@ export default function CartScreen() {
     const handleSearchRecipe = () => {
         // 레시피 탐색 화면으로 이동
         // expo-router에서 같은 Stack 내에서는 navigation.navigate 사용
+        if (cartItems.length==0){
+            Alert.alert("장바구니에 담긴 아이템이 없습니다");
+            return;
+        } 
         navigation.navigate('recipeSearch');
     };
 

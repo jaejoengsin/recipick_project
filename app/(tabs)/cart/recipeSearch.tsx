@@ -1,9 +1,12 @@
 import BookmarkCard from "@/components/BookmarkCard";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import useRecipeStore from '@/src/stores/recipeStore';
+
 
 // 목업 레시피 데이터 (장바구니 재료로 만들 수 있는 레시피)
 const MOCK_RECIPES = [
@@ -44,6 +47,15 @@ export default function RecipeSearchScreen() {
   const [recipes, setRecipes] = useState(MOCK_RECIPES);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<number>>(new Set());
 
+  const refreshRecipes = useRecipeStore(state => state.refreshRecipes);
+  const resultContent = useRecipeStore(state => state.resultContent);
+  const recipeDetails = useRecipeStore(state => state.recipeDetails);
+
+  useEffect(() => {
+    refreshRecipes();
+  }, []);
+  console.log(resultContent);
+  console.log(recipeDetails);
   const handleBack = () => {
     router.back();
   };
@@ -63,16 +75,22 @@ export default function RecipeSearchScreen() {
     });
   };
 
-  const renderItem = ({ item }) => (
-    <BookmarkCard
-      id={item.id}
-      foodName={item.name}
-      imageUrl={item.img}
-      ingredients={item.ingredients}
-      isBookmarked={bookmarkedIds.has(item.id)}
-      onBookmarkToggle={handleBookmarkToggle}
-    />
-  );
+  const renderItem = ({ item }) => {
+    const detail = recipeDetails[item.recipeId];
+
+    return (
+
+      <BookmarkCard
+        id={item.recipeId}
+        foodName={detail.title}
+        imageUrl={detail.imageUrl}
+        ingredients={null}
+        isBookmarked={bookmarkedIds.has(item.recipeId)}
+        onBookmarkToggle={handleBookmarkToggle}
+      />
+
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,9 +107,9 @@ export default function RecipeSearchScreen() {
 
       {/* 레시피 목록 */}
       <FlatList
-        data={recipes}
+        data={resultContent}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => String(resultContent.recipeId)}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>만들 수 있는 레시피가 없습니다.</Text>

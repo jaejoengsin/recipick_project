@@ -11,6 +11,7 @@ import apiClient from "./api.js";
  * 1. 레시피 히스토리 조회 API
  * GET /api/recipe/history
  * 사용자의 레시피 조회 기록을 가져옵니다.
+ * 
  * @param {object} pageable - 페이지네이션 정보
  */
 export const getRecipeHistory = async (pageable) => {
@@ -76,16 +77,16 @@ export const deleteRecipeFromHistory = async (historyRecipeId, pageable) => {
  * @param {Array<string>} ingredients - 필터링할 재료 목록
  * @param {object} pageable - 페이지네이션 정보
  */
-export const getRecipes = async (ingredients, pageable) => {
+export const getRecipes = async (pageable) => {
   try {
     // 💡 memberId 제거
     const params = {
       // 재료 배열을 쉼표로 구분된 문자열로 변환하여 쿼리 파라미터로 전송
-      ingredients: ingredients.join(","),
       ...pageable,
     };
 
     const response = await apiClient.get("/api/recipe", { params });
+    console.log("레시피 정보:", response.data);
     return response.data;
   } catch (error) {
     console.error("레시피 목록 조회 API 오류:", error);
