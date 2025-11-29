@@ -7,6 +7,8 @@ import {
     getRecipes
 } from '../api/recipe'; // API 파일 경로 확인 필요
 
+import useCartStore from './cartStore';
+
 const useRecipeStore = create((set, get) => ({
     // =================================================
     // [State] 저장소 상태 데이터
@@ -22,7 +24,7 @@ const useRecipeStore = create((set, get) => ({
     // 3. 레시피 상세 정보 (프론트 노출용 메인 데이터)
     // - 구조: { [recipeId]: { title, ingredients, steps, imageUrl }, ... }
     recipeDetails: {},
-S
+
     // 검색 조건 저장 (더보기/새로고침 시 사용)
 
     isLoading: false,
@@ -115,6 +117,8 @@ S
                 },
                 isLoading: false
             });
+
+            useCartStore.getState().refreshCartItems();
 
         } catch (error) {
             console.error("Recipe Fetch Error:", error);

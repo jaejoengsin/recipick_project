@@ -36,8 +36,12 @@ export const getRecipeHistory = async (pageable) => {
  */
 export const addRecipeToHistory = async (recipeId) => {
   try {
+    console.log("api id:"+recipeId);
+    const params = {
+      recipeId
+    };
     // 💡 memberId 제거. recipeId만 Request Body로 전송
-    await apiClient.post("/api/recipe/history", { recipeId });
+    const res = await apiClient.post("/api/recipe/history", {}, { params: params });
   } catch (error) {
     console.error("레시피 히스토리 추가 API 오류:", error);
     throw error;
@@ -53,17 +57,14 @@ export const addRecipeToHistory = async (recipeId) => {
  */
 export const deleteRecipeFromHistory = async (historyRecipeId, pageable) => {
   try {
+    const params = {
+      historyRecipeId,
+      ...pageable,
+    };
     // DELETE 요청에서 Request Body를 사용하려면 data 속성을 사용합니다.
     // 💡 memberId 제거
-    await apiClient.delete("/api/recipe/history", {
-      data: {
-        historyRecipeId,
-      },
-      params: {
-        // pageable은 쿼리 파라미터로 처리
-        ...pageable,
-      },
-    });
+    await apiClient.delete("/api/recipe/history",
+      {params: params});
   } catch (error) {
     console.error("레시피 히스토리 삭제 API 오류:", error);
     throw error;

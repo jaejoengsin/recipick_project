@@ -1,7 +1,7 @@
 import BookmarkCard from "@/components/BookmarkCard";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -44,49 +44,53 @@ const MOCK_RECIPES = [
 
 export default function RecipeSearchScreen() {
   const router = useRouter();
-  const [recipes, setRecipes] = useState(MOCK_RECIPES);
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<number>>(new Set());
+  
 
   const refreshRecipes = useRecipeStore(state => state.refreshRecipes);
   const resultContent = useRecipeStore(state => state.resultContent);
   const recipeDetails = useRecipeStore(state => state.recipeDetails);
+  const addToHistory =  useRecipeStore(state => state.addToHistory);
+  const deleteFromHistory =  useRecipeStore(state => state.deleteFromHistory);
+  const historyContent = useRecipeStore(state => state.historyContent);
+  const refreshHistory = useRecipeStore(state => state.refreshHistory);
+
 
   useEffect(() => {
     refreshRecipes();
+    refreshHistory();
   }, []);
-  console.log(resultContent);
-  console.log(recipeDetails);
+  
   const handleBack = () => {
     router.back();
   };
 
   // 북마크 추가 로직
-  const handleBookmarkToggle = (id: number) => {
-    setBookmarkedIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-        console.log(`레시피 ${id} 북마크 해제`);
-      } else {
-        newSet.add(id);
-        console.log(`레시피 ${id} 북마크 추가`);
-      }
-      return newSet;
-    });
+  const handleBookmarkToggle = (targetBookMark = null, recipeId:number) => {
+    try{
+      console.log("bookmark:"+targetBookMark);
+      console.log("id"+recipeId);
+      if (targetBookMark) deleteFromHistory(targetBookMark.historyRecipeId);
+      else addToHistory(recipeId);
+    }catch(error){
+      console.error("북마크 추가/삭제 중 에러:" + error);
+    } finally{
+    }
   };
 
   const renderItem = ({ item }) => {
     const detail = recipeDetails[item.recipeId];
-
+    const targetBookMark = historyContent.find(historyItem => historyItem.recipeId === item.recipeId);
+    console.log("his id: " + targetBookMark?.historyRecipeId)
+    console.log("선택한 hist는 :" +targetBookMark);
+    const isBookmarked = targetBookMark ? true : false;
     return (
-
       <BookmarkCard
         id={item.recipeId}
         foodName={detail.title}
         imageUrl={detail.imageUrl}
-        ingredients={null}
-        isBookmarked={bookmarkedIds.has(item.recipeId)}
-        onBookmarkToggle={handleBookmarkToggle}
+        ingredients={detail.ingredients}
+        isBookmarked={isBookmarked}
+        onBookmarkToggle={() => handleBookmarkToggle(targetBookMark,item.recipeId)}
       />
 
     );
@@ -109,7 +113,7 @@ export default function RecipeSearchScreen() {
       <FlatList
         data={resultContent}
         renderItem={renderItem}
-        keyExtractor={(item) => String(resultContent.recipeId)}
+        keyExtractor={(item) => String(item.recipeId)}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>만들 수 있는 레시피가 없습니다.</Text>

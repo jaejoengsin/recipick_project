@@ -8,7 +8,7 @@ interface BookmarkCardProps {
   foodName: string;
   imageUrl: string;
   // 식재료 정보가 필요하므로 props에 추가합니다.
-  ingredients: string[];
+  ingredients: string;
   onRemove?: (id: number) => void; // 북마크 화면에서 사용
   onBookmarkToggle?: (id: number) => void; // 레시피 탐색 화면에서 사용
   isBookmarked?: boolean; // 북마크 상태 (기본값: true)
@@ -42,7 +42,7 @@ export default function BookmarkCard({
   // 2. 💡 카드 클릭 시: 상세 페이지로 이동합니다.
   const handleCardPress = () => {
     // 'recipeDetail' 라우트로 이동하며, ID와 이름을 파라미터로 전달합니다.
-    navigation.navigate("recipeDetail", { recipeId: id, foodName: foodName });
+    navigation.navigate("recipeDetail", { recipeId: id });
     console.log(`${foodName} 상세 페이지로 이동 (${id})`);
   };
 
@@ -60,7 +60,7 @@ export default function BookmarkCard({
           <Text style={styles.foodName}>{foodName}</Text>
           <Text style={styles.description}>
             {/* 식재료 표시 */}
-            주요 재료: {ingredients ? ingredients.join(", ") : "정보 없음"}
+            주요 재료: {ingredients}
           </Text>
         </View>
       </TouchableOpacity>
